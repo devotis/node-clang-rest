@@ -27,8 +27,6 @@ soap.createClient(url, function(err, client) {
     		continue; //go to next iteration
 
     	//It's just these objects that offer full CRUD: customer, group, email, sms
-    	 
-
     	var method = clang.clangAPI.clangPort[key];
     	if (!clang.objects[methodNameParts[0]]) {
     		clang.objects[methodNameParts[0]]={
@@ -36,7 +34,7 @@ soap.createClient(url, function(err, client) {
     		};
     	}
 
-        //some method do not output records directly, instead the return a reference to a resource set
+        //some method do not output records directly, instead they return a reference to a resource set
         //this bit within if captures these methods and adds a property to indicate
         //that the output has to be fetched through a resourceSet
     	if (method.output.code == "xsd:integer" &&
@@ -45,7 +43,7 @@ soap.createClient(url, function(err, client) {
     			'customer_getTotalNumberOfCustomers',
     			'magentoEmail_insert',
     			'magento_executeAbandonedCart'
-    		].indexOf(key) === -1) {
+    		].indexOf(key) === -1) { //the output of these methods is not referring to a resource but have similar output as the ones that do
 
     		method.useResource = true;
     	    resourceMatch = methodNameParts[1].match(/get(\w+)Set/);
@@ -78,8 +76,7 @@ soap.createClient(url, function(err, client) {
     console.log('SOAP methods analyzed. Avaliable for CRUD:', Object.keys(clang.objects).join(', '));
 
 
-
-//INIT WEB - WORKING
+    //INIT WEB
 	var app = express();
     app.all('/api/clang/:object?/:id?', function(req, res){
     	var uuid = req.headers.uuid;
@@ -89,7 +86,7 @@ soap.createClient(url, function(err, client) {
     		return; 
 		}
         if (Object.keys(clang.objects).indexOf(req.params.object) === -1) {
-        	res.status(404); //resource actually not available
+        	res.status(404);
     		res.send('404 - resource actually not available');
     		return; 
         }
