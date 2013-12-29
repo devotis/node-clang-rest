@@ -1,4 +1,4 @@
-clang-rest
+Node Clang API
 ==========
 
-RESTifies the Clang SOAP API
+This app normalizes the Clang SOAP API into a restful JSON API.
