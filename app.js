@@ -20,7 +20,7 @@ app.all('/api/clang/:object?/:id?', function(req, res) {
             }
         });
 
-        res.send('Clang api not created yet. Wait a few seconds and try again.')
+        res.send('Clang api not created yet. Try again in a few seconds.')
         return;
     }
 
