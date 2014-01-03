@@ -62,7 +62,7 @@ app.all('/api/clang/:object?/:id?', function(req, res) {
             args[clangObjectName].id = req.params.id;
             break;
     	default      :
-            res.status(405); return; //HTTP verb used to access this page is not allowed
+            res.status(405); return; //HTTP verb for this resource is not allowed
     }
     
     api.objects[clangObjectName][clangMethodName](args, function(err, rows) {
