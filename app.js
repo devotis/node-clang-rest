@@ -7,8 +7,7 @@ app.all('/api/clang/:object?/:id?', function(req, res) {
     if (!api) {
         var uuid = req.headers.uuid || req.query._uuid;
         if (!uuid || !uuid.match(/^([0-9]-)?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i)) { //Clang (probably) uses a version 4 UUIDs scheme relying only on random numbers.
-            res.status(401); //The client tried to operate on a protected resource without providing the proper authentication credentials.
-            res.send('401 - uuid missing or invalid');
+            res.json(401, { error: 'uuid missing or invalid' }); //The client tried to operate on a protected resource without providing the proper authentication credentials.
             return; 
         }
 
@@ -26,8 +25,7 @@ app.all('/api/clang/:object?/:id?', function(req, res) {
     }
 
     if (Object.keys(api.objects).indexOf(req.params.object) === -1) {
-    	res.status(404);
-		res.send('404 - resource actually not available');
+        res.json(404, { error: 'resource ('+req.params.object+') actually not available' });
 		return; 
     }
 
@@ -35,8 +33,12 @@ app.all('/api/clang/:object?/:id?', function(req, res) {
     var clangObjectName = req.params.object;
     var clangMethodName;
     var args = {};
+    var method = req.query._method || req.method;
 
-    switch(req.query._method || req.method) { //HTTP VERB override through query paramater (override through http header would be better)
+    delete req.query._method;
+    delete req.query._uuid;
+
+    switch(method) { //HTTP VERB override through query paramater (override through http header would be better)
     	case 'GET'   : 
             if (req.params.id) {
                 clangMethodName = 'getById'
@@ -62,15 +64,15 @@ app.all('/api/clang/:object?/:id?', function(req, res) {
             args[clangObjectName].id = req.params.id;
             break;
     	default      :
-            res.status(405); return; //HTTP verb for this resource is not allowed
+            res.json(405, { error: 'HTTP verb for this resource is not allowed'});
+            return;
     }
-    
+
     api.objects[clangObjectName][clangMethodName](args, function(err, rows) {
         if (err) {
-            res.status(500);
-            res.send('500 - ' + err.message)
+            res.json(500, { error: err.message });
         } else {
-            res.send(rows);
+            res.json(rows);
         }
     });
 });
