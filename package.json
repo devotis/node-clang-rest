@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "RESTifies Clang's API",
   "dependencies": {
+  	"express": "3.x",
     "clang": "git://github.com/devotis/clang.git#master"
   }
 }
