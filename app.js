@@ -16,7 +16,7 @@ app.all('/api/clang/:object?/:id?', function(req, res) {
     req.session.uuid = uuid; //store given uuid in session for the browser
 
     if (!api) {
-        clang.init('1.18', function(err, result) {
+        clang.init(function(err, result) {
             if (err) {
                 console.log('Error creating clang api', err.message);    
             } else {
