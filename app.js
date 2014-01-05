@@ -52,21 +52,21 @@ app.all('/api/clang/:object?/:id?', function(req, res) {
                 clangMethodName = 'getAll'
             } else {
                 clangMethodName = 'getByObject'
-                args[clangObjectName] = req.query;
+                args            = req.query;
             } 
             break;
     	case 'POST'  :
-            clangMethodName          = 'insert';
-            args[clangObjectName]    = req.query;
+            clangMethodName     = 'insert';
+            args                = req.query;
             break;
     	case 'PUT'   :
-            clangMethodName          = 'update';
-            args[clangObjectName]    = req.query;
-            args[clangObjectName].id = req.params.id;
+            clangMethodName     = 'update';
+            args                = req.query;
+            args.id             = req.params.id;
             break;
     	case 'DELETE':
-            clangMethodName          = 'delete';
-            args[clangObjectName].id = req.params.id;
+            clangMethodName     = 'delete';
+            args.id             = req.params.id;
             break;
     	default      :
             res.json(405, { error: 'HTTP verb for this resource is not allowed'});
