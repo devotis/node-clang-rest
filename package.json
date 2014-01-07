@@ -4,6 +4,8 @@
   "description": "RESTifies Clang's API",
   "dependencies": {
   	"express": "3.x",
-    "clang": "git://github.com/devotis/clang.git#master"
+    "clang": "git://github.com/devotis/clang.git#master",
+    "bunyan": "0.x",
+    "express-bunyan-logger": "git://github.com/devotis/express-bunyan-logger.git"
   }
 }

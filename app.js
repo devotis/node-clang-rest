@@ -1,11 +1,18 @@
 var express = require('express');
 var clang   = require('clang');
+var bunyan  = require('bunyan');
+var bunyanLogger = require('express-bunyan-logger');
 var config  = require('./config');
 
 var api;
 var app = express();
 app.use(express.cookieParser());
 app.use(express.session({secret: config.web.ssecret}));
+
+var bunyanOpts = {name: __filename.split('\\')[__filename.split('\\').length-1]};
+app.use(bunyanLogger());
+app.use(bunyanLogger.errorLogger(bunyanOpts));
+var logger = bunyan.createLogger(bunyanOpts);
 
 app.all('/clang/:object?/:id?/:customaction?', function(req, res) {
     var uuid = req.headers.uuid || req.query._uuid || req.session.uuid || '';
@@ -101,12 +108,12 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res) {
 
 clang.init(function(err, result) {
     if (err) {
-        console.log('Error creating clang api', err.message);    
+        logger.error('Error creating clang api', err.message);    
     } else {
-        console.log('Clang api created');
+        logger.info('Clang api created');
         api = result;
 
         app.listen(config.web.port);
-        console.log('Listening on port '+config.web.port);
+        logger.info('Listening on port '+config.web.port);
     }
 });
