@@ -53,7 +53,8 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res) {
     switch(method) {
     	case 'GET'   : 
             if (req.params.id) {
-                clangMethodName = 'getById'
+                clangMethodName = 'getById';
+                args            = req.query; //we need query parameters because the method may be overriden by customaction
                 args[clangObjectName + 'Id'] = req.params.id;
             } else if (Object.keys(req.query).length === 0) {
                 clangMethodName = 'getAll'
