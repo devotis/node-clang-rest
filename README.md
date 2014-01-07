@@ -16,6 +16,8 @@ Authentication to the Clang Webservice API is done using a token (uuid). Contact
 
 The first request to any resource will result in a 401 to indicate the uuid is missing. Then you can add _uuid to the query parameters. It will be kept in your session. Session is maintained using a cookie. The supplied uuid will be proxied to Clang with each request.
 
+The next request (with uuid) may result in a 503 error ('Clang api not created yet. Try again in a few seconds.'). Follow this advice.
+
 ###customers
 
 Example operations
@@ -36,3 +38,11 @@ HTTP verb can be overriden using _method query parameter
 
 - GET /clang/emails/26597
 - GET /clang/emails/26597/sendToCustomer?customerId=328191
+
+###Errors
+
+Errors are reported in JSON format
+
+    {
+      error: 'Clang api not created yet. Try again in a few seconds.'
+    }
