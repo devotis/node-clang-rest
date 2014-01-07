@@ -99,11 +99,3 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res) {
 
 app.listen(config.web.port);
 console.log('Listening on port '+config.web.port);
-
-
-/* Custom actions on resources:
-http://stackoverflow.com/questions/630453/put-vs-post-in-rest   
-http://stackoverflow.com/questions/10885152/rest-shouldnt-put-create-and-post-update   
-http://microformats.org/wiki/rest/urls   
-Michael • 32
-*/
