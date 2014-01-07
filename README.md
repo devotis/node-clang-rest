@@ -37,7 +37,9 @@ HTTP verb can be overriden using _method query parameter
 ###emails
 
 - GET /clang/emails/26597
-- GET /clang/emails/26597/sendToCustomer?customerId=328191
+- POST /clang/emails/26597/sendToCustomer?customerId=328191
+
+The last example is a custom action on a single resource. That is only allowed using POST.
 
 ###Errors
 
