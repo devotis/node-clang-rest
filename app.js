@@ -26,16 +26,23 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res) {
             }
         });
 
-        res.json(503, { error: 'Clang api not created yet. Try again in a few seconds.' })
+        res.json(503, { error: 'Clang api not created yet. Try again in a few seconds.' });
         return;
     }
 
-    if (Object.keys(api.objects).indexOf(req.params.object) === -1) {
-        res.json(404, { error: 'Resource ('+req.params.object+') actually not available' });
+    var clangObjectName = req.params.object;
+    if (!clangObjectName) {
+        res.json(500, { error: 'Resource not specified' });
+        return;
+    }
+    if (clangObjectName.match(/s$/) && !clangObjectName.match(/sms|tatistics$/)) {
+        clangObjectName = clangObjectName.slice(0, -1);
+    }
+    if (Object.keys(api.objects).indexOf(clangObjectName) === -1) {
+        res.json(404, { error: 'Resource ('+clangObjectName+') actually not available' });
 		return; 
     }
 
-    var clangObjectName = req.params.object;
     var clangMethodName;
     var args = {};
     var method = req.query._method || req.method;  //HTTP VERB override through query paramater (override through http header would be better)
@@ -91,6 +98,7 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res) {
 
 app.listen(config.web.port);
 console.log('Listening on port '+config.web.port);
+
 
 /* Custom actions on resources:
 http://stackoverflow.com/questions/630453/put-vs-post-in-rest   
