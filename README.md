@@ -41,10 +41,23 @@ HTTP verb can be overriden using _method query parameter
 
 The last example is a custom action on a single resource. That is only allowed using POST.
 
-###Errors
+###Representation
 
-Errors are reported in JSON format
+I picked a JSend like way of output after checking online (http://stackoverflow.com/a/14538774/1385429)
 
     {
-      error: 'Clang api not created yet. Try again in a few seconds.'
+      "status": "success",
+      "data": [{...customer state...}, {...}, ...]
     }
+
+    {
+      "status": "success",
+      "data": null
+    }
+
+    {
+      "status": "error",
+      "message": "...some error message......."
+    }
+
+HTTP statusses as you would expect from a RESTful webservice remain intact.
