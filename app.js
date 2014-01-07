@@ -74,6 +74,9 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res) {
     }
 
     clangMethodName = req.params.customaction || clangMethodName; //override methodName with custom action like sendToCustomer
+    if ( !api.objects[clangObjectName][clangMethodName] ) {
+        res.json(405, { error: 'Method for this resource is not allowed'});
+    }
 
     args.uuid = uuid;
 
