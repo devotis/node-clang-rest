@@ -11,32 +11,33 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res) {
     var uuid = req.headers.uuid || req.query._uuid || req.session.uuid || '';
     //console.log('req.params', req.params);
     if (!uuid || !uuid.match(/^([0-9]-)?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i)) { //Clang (probably) uses a version 4 UUIDs scheme relying only on random numbers.
-        res.json(401, { error: 'uuid missing or invalid (add _uuid=... to your url)' }); //The client tried to operate on a protected resource without providing the proper authentication credentials.
+        res.json(401, { status : "error", error: 'uuid missing or invalid (add _uuid=... to your url)' }); //The client tried to operate on a protected resource without providing the proper authentication credentials.
         return; 
     }
     req.session.uuid = uuid; //store given uuid in session for the browser
 
     if (!api) {
-        res.json(503, { error: 'Clang api not created yet. Try again in a few seconds.' });
+        res.json(503, { status : "error", error: 'Clang api not created yet. Try again in a few seconds.' });
         return;
     }
 
     var clangObjectName = req.params.object;
     if (!clangObjectName) {
-        res.json(500, { error: 'Resource not specified' });
+        res.json(500, { status : "error", error: 'Resource not specified' });
         return;
     }
     if (clangObjectName.match(/s$/) && !clangObjectName.match(/sms|tatistics$/)) {
         clangObjectName = clangObjectName.slice(0, -1);
     }
     if (Object.keys(api.objects).indexOf(clangObjectName) === -1) {
-        res.json(404, { error: 'Resource ('+clangObjectName+') actually not available' });
+        res.json(404, { status : "error", error: 'Resource ('+clangObjectName+') actually not available' });
 		return; 
     }
 
     var clangMethodName;
     var args = {};
     var method = req.query._method || req.method;  //HTTP VERB override through query paramater (override through http header would be better)
+
 
     delete req.query._method;
     delete req.query._uuid;
@@ -45,7 +46,7 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res) {
     	case 'GET'   : 
             if (req.params.id) {
                 clangMethodName = 'getById';
-                args            = req.query; //we need query parameters because the method may be overriden by customaction
+                args            = req.query;
                 args[clangObjectName + 'Id'] = req.params.id;
             } else if (Object.keys(req.query).length === 0) {
                 clangMethodName = 'getAll'
@@ -55,8 +56,19 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res) {
             } 
             break;
     	case 'POST'  :
-            clangMethodName     = 'insert';
-            args                = req.query;
+            if (req.params.customaction) {
+                clangMethodName = req.params.customaction; //override methodName with custom action like sendToCustomer (for POST only)
+                if (req.params.id) {
+                    args                         = req.query;
+                    args[clangObjectName + 'Id'] = req.params.id;
+                } else {
+                    res.json(500, { status : "error", error: 'Custom action invoked on unspecified resource (use /objects/123/customaction)' });
+                    return;
+                }
+            } else {
+                clangMethodName = 'insert';
+                args            = req.query;
+            }
             break;
     	case 'PUT'   :
             clangMethodName     = 'update';
@@ -68,22 +80,21 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res) {
             args.id             = req.params.id;
             break;
     	default      :
-            res.json(405, { error: 'HTTP verb for this resource is not allowed'});
+            res.json(405, { status : "error", error: 'HTTP verb for this resource is not allowed'});
             return;
     }
 
-    clangMethodName = req.params.customaction || clangMethodName; //override methodName with custom action like sendToCustomer
     if ( !api.objects[clangObjectName][clangMethodName] ) {
-        res.json(405, { error: 'Method for this resource is not allowed'});
+        res.json(405, { status : "error", error: 'Method for this resource is not allowed'});
     }
 
     args.uuid = uuid;
 
     api.objects[clangObjectName][clangMethodName](args, function(err, rows) {
         if (err) {
-            res.json(500, { error: err.message });
+            res.json(500, { status : "error", error: err.message });
         } else {
-            res.json(rows);
+            res.json({status : "success", data : rows});
         }
     });
 });
