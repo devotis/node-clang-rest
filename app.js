@@ -11,21 +11,12 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res) {
     var uuid = req.headers.uuid || req.query._uuid || req.session.uuid || '';
     //console.log('req.params', req.params);
     if (!uuid || !uuid.match(/^([0-9]-)?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i)) { //Clang (probably) uses a version 4 UUIDs scheme relying only on random numbers.
-        res.json(401, { error: 'uuid missing or invalid' }); //The client tried to operate on a protected resource without providing the proper authentication credentials.
+        res.json(401, { error: 'uuid missing or invalid (add _uuid=... to your url)' }); //The client tried to operate on a protected resource without providing the proper authentication credentials.
         return; 
     }
     req.session.uuid = uuid; //store given uuid in session for the browser
 
     if (!api) {
-        clang.init(function(err, result) {
-            if (err) {
-                console.log('Error creating clang api', err.message);    
-            } else {
-                console.log('Clang api created');
-                api = result;
-            }
-        });
-
         res.json(503, { error: 'Clang api not created yet. Try again in a few seconds.' });
         return;
     }
@@ -97,5 +88,14 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res) {
     });
 });
 
-app.listen(config.web.port);
-console.log('Listening on port '+config.web.port);
+clang.init(function(err, result) {
+    if (err) {
+        console.log('Error creating clang api', err.message);    
+    } else {
+        console.log('Clang api created');
+        api = result;
+
+        app.listen(config.web.port);
+        console.log('Listening on port '+config.web.port);
+    }
+});
