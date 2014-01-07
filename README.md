@@ -2,7 +2,7 @@
 
 Node based JSON/HTTP proxy to the Clang's SOAP webservice API.
 
-This is a restful webservice that proxies HTTP/GET requests to Clang's SOAP API, passing along any parameters in the query string. All requests are proxied to Clang using HTTPS. Returns SOAP responses as JSON.
+This is a restful webservice that proxies HTTP requests to Clang's SOAP API, passing along any parameters in the query string. All requests are proxied to Clang using HTTPS. Returns SOAP responses as JSON.
 
 ##Demo version here
 
