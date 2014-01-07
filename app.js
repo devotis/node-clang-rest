@@ -7,8 +7,9 @@ var app = express();
 app.use(express.cookieParser());
 app.use(express.session({secret: config.web.ssecret}));
 
-app.all('/api/clang/:object?/:id?', function(req, res) {
+app.all('/clang/:object?/:id?/:customaction?', function(req, res) {
     var uuid = req.headers.uuid || req.query._uuid || req.session.uuid || '';
+    //console.log('req.params', req.params);
     if (!uuid || !uuid.match(/^([0-9]-)?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i)) { //Clang (probably) uses a version 4 UUIDs scheme relying only on random numbers.
         res.json(401, { error: 'uuid missing or invalid' }); //The client tried to operate on a protected resource without providing the proper authentication credentials.
         return; 
@@ -34,7 +35,6 @@ app.all('/api/clang/:object?/:id?', function(req, res) {
 		return; 
     }
 
-    console.log('req.params', req.params);
     var clangObjectName = req.params.object;
     var clangMethodName;
     var args = {};
@@ -73,6 +73,8 @@ app.all('/api/clang/:object?/:id?', function(req, res) {
             return;
     }
 
+    clangMethodName = req.params.customaction || clangMethodName; //override methodName with custom action like sendToCustomer
+
     args.uuid = uuid;
 
     api.objects[clangObjectName][clangMethodName](args, function(err, rows) {
@@ -84,5 +86,12 @@ app.all('/api/clang/:object?/:id?', function(req, res) {
     });
 });
 
-app.listen(3000);
-console.log('Listening on port 3000');
+app.listen(config.web.port);
+console.log('Listening on port '+config.web.port);
+
+/* Custom actions on resources:
+http://stackoverflow.com/questions/630453/put-vs-post-in-rest   
+http://stackoverflow.com/questions/10885152/rest-shouldnt-put-create-and-post-update   
+http://microformats.org/wiki/rest/urls   
+Michael • 32
+*/
