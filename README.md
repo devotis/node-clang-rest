@@ -10,7 +10,9 @@ https://node.leadstoloyals.com
 
 ##Authentication
 
-Authentication to the Clang Webservice API is done by using a token. Contact the Support Desk of your Clang reseller to obtain a token. A token is a uuid that has to be supplied through either HTTP header uuid or query parameter _uuid
+Authentication to the Clang Webservice API is done using a token (uuid). Contact the Support Desk of your Clang reseller to obtain a token. [Contact Leads to Loyals](http://www.leadstoloyals.nl/en/contact.html) if you'd like to learn more about using Clang and this API.
+
+A token is a uuid that has to be supplied through either HTTP header uuid or query parameter _uuid
 
 ##Resources
 
