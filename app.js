@@ -1,9 +1,7 @@
 var express = require('express');
 var clang   = require('clang');
-//var loggly  = require('loggly');
 var config  = require('./config');
 
-//var logger = loggly.createClient(config.loggly);
 var api;
 var app = express();
 //the sequence of use() matters. It's the sequence middleware is executed
@@ -28,10 +26,7 @@ app.use(function(err, req, res, next) {
 });
 
 app.all('/clang/:object?/:id?/:customaction?', function(req, res, next) {
-    throw new Error('try this errrrrqq1234');
-    
     var uuid = req.headers.uuid || req.query._uuid || req.session.uuid || '';
-    //console.log('req.params', req.params);
     if (!uuid || !uuid.match(/^([0-9]-)?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i)) { //Clang (probably) uses a version 4 UUIDs scheme relying only on random numbers.
         res.statusCode = 401;
         next(new Error('uuid missing or invalid (add _uuid=... to your url)')); //The client tried to operate on a protected resource without providing the proper authentication credentials.
@@ -63,7 +58,6 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res, next) {
     var clangMethodName;
     var args = {};
     var method = req.query._method || req.method;  //HTTP VERB override through query paramater (override through http header would be better)
-
 
     delete req.query._method;
     delete req.query._uuid;
@@ -128,7 +122,6 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res, next) {
         }
     });
 });
-
 
 clang.init(function(err, result) {
     if (err) {
