@@ -5,7 +5,7 @@
   "dependencies": {
   	"express": "3.x",
     "clang": "git://github.com/devotis/clang.git#master",
-    "bunyan": "0.x",
-    "express-bunyan-logger": "git://github.com/devotis/express-bunyan-logger.git"
+    "loggly":  "1.x",
+    "express-loggly": "git://github.com/devotis/node-express-loggly.git"
   }
 }
