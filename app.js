@@ -1,29 +1,26 @@
 var config  = require('./config');
 var clang   = require('clang');
 var express = require('express');
-var explogg = require('express-loggly')(config.loggly);
+var logger  = require('express-loggly')(config.loggly);
 
 var api;
 var app = express();
 app.use(express.cookieParser());
 app.use(express.session({secret: config.web.ssecret}));
-app.use(explogg.requestLogger());
+app.use(logger.requestLogger());
 app.use(app.router);
 app.use(function(req, res, next){
     // Since this is the last non-error-handling middleware use()d, we assume 404, as nothing else responded.
     res.statusCode = 404;
-    return next(new Error('Page not found.'));
+    return next(new Error('Page not found'));
 });
 // error-handling middleware starts here! They take the same form as regular middleware,
 // however they require an arity of 4, aka the signature (err, req, res, next).
 // when connect has an error, it will invoke ONLY error-handling middleware.
-app.use(explogg.errorLogger()); //http://stackoverflow.com/questions/15684130/express-js-error-handling
+app.use(logger.errorLogger()); //http://stackoverflow.com/questions/15684130/express-js-error-handling
 app.use(function(err, req, res, next) {
-    console.log('Error handler');
     res.json(500, { status : "error", error: (typeof err === 'string' ? err : err.message) });
 });
-
-var config = loggly.createClient(config.loggly);
 
 app.all('/clang/:object?/:id?/:customaction?', function(req, res, next) {
     var uuid = req.headers.uuid || req.query._uuid || req.session.uuid || '';
@@ -119,12 +116,12 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res, next) {
 
 clang.init(function(err, result) {
     if (err) {
-        console.log('Error creating clang api', err.message);    
+        logger.error('Error creating clang api' + err.message);    
     } else {
-        console.log('Clang api created', ['clang', 'node']);
+        logger.info('Clang api created');
         api = result;
 
         app.listen(config.web.port);
-        console.log('Listening on port '+config.web.port, ['clang', 'node', 'web']);
+        logger.info('Listening on port ' + config.web.port);
     }
 });
