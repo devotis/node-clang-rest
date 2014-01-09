@@ -22,6 +22,7 @@ app.use(function(err, req, res, next) {
     res.json(500, { status : "error", error: (typeof err === 'string' ? err : err.message) });
 });
 
+
 app.all('/clang/:object?/:id?/:customaction?', function(req, res, next) {
     var uuid = req.headers.uuid || req.query._uuid || req.session.uuid || '';
     if (!uuid || !uuid.match(/^([0-9]-)?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i)) { //Clang (probably) uses a version 4 UUIDs scheme relying only on random numbers.
@@ -114,7 +115,8 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res, next) {
     });
 });
 
-clang.init(function(err, result) {
+
+clang.init(logger, function(err, result) {
     if (err) {
         logger.error('Error creating clang api' + err.message);    
     } else {
