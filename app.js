@@ -22,6 +22,26 @@ app.use(function(err, req, res, next) {
     res.json(500, { status : "error", error: (typeof err === 'string' ? err : err.message) });
 });
 
+app.get('/', function(req, res, next) {
+    res.redirect('https://github.com/devotis/node-clang-rest');
+});
+
+app.get('/clang/objects', function(req, res, next) {
+    var result = {}, object;
+    for (var key in api.objects) {
+        if (api.objects.hasOwnProperty(key) && !key.match(/Set|resource/)) {
+            object = api.objects[key];
+            result[key] = {};
+            for (var key2 in object) {
+                if (object.hasOwnProperty(key2) && typeof object[key2] === "function") {
+                    result[key][key2] = 'function';
+                }
+            }
+        }
+    }
+
+    res.json(200, {status : "success", data : result});
+});
 
 app.all('/clang/:object?/:id?/:customaction?', function(req, res, next) {
     var uuid = req.headers.uuid || req.query._uuid || req.session.uuid || '';
@@ -93,7 +113,7 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res, next) {
         clangMethodName     = 'delete';
         args.id             = req.params.id;
         break;
-	default      :
+    default      :
         res.statusCode = 405;
         return next(new Error('HTTP verb for this resource is not allowed'));
     }
@@ -114,7 +134,6 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res, next) {
         res.json(200, {status : "success", data : rows});
     });
 });
-
 
 clang.init(logger, function(err, result) {
     if (err) {
