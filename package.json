@@ -7,5 +7,6 @@
     "clang": "git://github.com/devotis/clang.git#master",
     "loggly":  "1.x",
     "express-loggly": "git://github.com/devotis/node-express-loggly.git"
-  }
+  },
+  "private": true
 }
