@@ -75,6 +75,7 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res, next) {
 
   delete req.query._method;
   delete req.query._uuid;
+  var numKeys = Object.keys(req.query).length;
 
   switch(method) {
   case 'GET'   : 
@@ -82,8 +83,11 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res, next) {
       clangMethodName = 'getById';
       args      = req.query;
       args[clangObjectName + 'Id'] = req.params.id;
-    } else if (Object.keys(req.query).length === 0) {
+    } else if (numKeys === 0) {
       clangMethodName = 'getAll';
+    } else if (req.query['externalId'] && numKeys === 1) {
+      clangMethodName = 'getByExternalId';
+      args['externalId'] = req.query['externalId'];
     } else {
       clangMethodName = 'getByObject';
       args      = req.query;
