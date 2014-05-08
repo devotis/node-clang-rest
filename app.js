@@ -128,6 +128,7 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res, next) {
   }
 
   args.uuid = uuid;
+  console.log('clang call via rest interface', clangObjectName, clangMethodName, req.protocol + '://' + req.get('host') + req.originalUrl);
 
   api.objects[clangObjectName][clangMethodName](args, function(err, rows) {
     if (err) {
