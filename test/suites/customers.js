@@ -12,10 +12,34 @@ var requestClang   = supertest(base.clangUrl);
 
 
 module.exports = function() {
-  it('Getting customers should work', function(done) {
+  it('Getting an non-existing customer should fail', function(done) {
     this.timeout(10*1000); //10 seconde, ivm trage responstijd Clang
     requestClang
-      .get('/emails/30245')
+      .get('/customers/0')
+      .set('uuid', '2e4c06eb-e377-48a5-a25f-4fe2eb285b8b')
+      .expect('Content-Type', /json/)
+      .expect(function(res) {
+        console.log(res.text);
+      })
+      .expect(500, done);
+  }); //it
+
+  it('Getting a non-existing email should fail', function(done) {
+    this.timeout(10*1000); //10 seconde, ivm trage responstijd Clang
+    requestClang
+      .get('/emails/0')
+      .set('uuid', '2e4c06eb-e377-48a5-a25f-4fe2eb285b8b')
+      .expect('Content-Type', /json/)
+      .expect(function(res) {
+        console.log(res.text);
+      })
+      .expect(500, done);
+  }); //it
+/*
+  it('Getting a non-existing email should fail', function(done) {
+    this.timeout(10*1000); //10 seconde, ivm trage responstijd Clang
+    requestClang
+      .get('/emails/0')
       .set('uuid', '2e4c06eb-e377-48a5-a25f-4fe2eb285b8b')
       .expect('Content-Type', /json/)
       .expect(function(res) {
@@ -27,4 +51,5 @@ module.exports = function() {
       })
       .expect(500, done);
   }); //it
+*/
 };
