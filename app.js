@@ -3,12 +3,13 @@ var lib     = require('./lib');
 var llips   = require('llips')(config, lib);
 var clang   = require('clang');
 var express = require('express');
+var RedisStore  = require('connect-redis')(express);
 var logger  = require('express-loggly')(config.loggly);
 
 var api;
 var app = express();
 app.use(express.cookieParser());
-app.use(express.session({secret: config.web.ssecret}));
+app.use(express.session({store: new RedisStore(config.web.session.redis), secret: config.web.session.secret}));
 app.use(logger.requestLogger());
 app.use(app.router);
 app.use(function(req, res, next){
