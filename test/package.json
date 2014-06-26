@@ -1,0 +1,9 @@
+{
+  "name": "node-clang-rest-test",
+  "version": "0.0.1",
+  "dependencies": {
+    "supertest": "*",
+    "should": "*"
+  },
+  "private": true
+}
