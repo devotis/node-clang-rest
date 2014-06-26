@@ -130,14 +130,7 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res, next) {
 
   args.uuid = uuid;
 
-  api.objects[clangObjectName][clangMethodName](args, function(err, rows) {
-    if (err) {
-      res.statusCode = 500;
-      return next(err);
-    }
-
-    res.json(200, {status : "success", data : rows});
-  });
+  api.objects[clangObjectName][clangMethodName](args, llips.resToRes(req, res, next, 200));
 });
 
 clang.init(logger, function(err, result) {
