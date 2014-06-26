@@ -1,6 +1,6 @@
 {
   "name": "clang-rest",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "RESTifies Clang's API",
   "dependencies": {
   	"express": "3.x",
