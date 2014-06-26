@@ -2,5 +2,6 @@
 require('llips')().test.webconfig();
 process.env['mocha-unfunk-style'] = 'css';
 
-//describe('Brands',      require('./suites/customers')); check all uuids :)
-describe('Customers',      require('./suites/customers'));
+describe('Brands',    require('./suites/brands'));
+describe('Customers', require('./suites/customers'));
+//describe('Emails',    require('./suites/emails'));
