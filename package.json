@@ -8,7 +8,6 @@
     "clang": "git://github.com/devotis/clang.git#master",
     "loggly":  "1.x",
     "express-loggly": "git://github.com/devotis/node-express-loggly.git",
-    "llips": "git+https://6cfaf73a5f3afd3455d003e23f84661328aec2bc:x-oauth-basic@github.com/devotis/node-llips.git",
     "async": "0.x",
     "lodash": "2.x"
   },
