@@ -10,6 +10,8 @@ var base   = require('../lib/base');
 var supertest = require('supertest');
 var requestClang   = supertest(base.clangUrl);
 
+var email;
+
 module.exports = function() {
   it('Getting some customers should work', function(done) {
     this.timeout(10*1000); //30 seconden, ivm trage responstijd Clang
@@ -28,21 +30,35 @@ module.exports = function() {
       .expect(200)
       .end(llips.test.noIISnodeDevError(done));
   }); //it
-/*
-  it('Getting a non-existing email should fail', function(done) {
-    this.timeout(10*1000); //10 seconde, ivm trage responstijd Clang
+
+  it('Getting some emails should work', function(done) {
+    this.timeout(10*1000); //30 seconden, ivm trage responstijd Clang
     requestClang
-      .get('/emails/0')
-      .set('uuid', '2e4c06eb-e377-48a5-a25f-4fe2eb285b8b')
+      .get('/emails')
+      .set('uuid', base.brands.loyalz)
       .expect('Content-Type', /json/)
       .expect(function(res) {
-        console.log(res.text);
-        res.body.data.should.be.an.Array.with.lengthOf(1);
-        res.body.data[0].should.have.property('htmlContent');
-        res.body.data[0].should.have.property('htmlBlocks');
-        res.body.data[0].should.have.property('name').an.be.not.empty;
+        res.body.data.should.be.an.Array.and.have.property('length').above(0);
+        console.log('length', res.body.data.length);
+        res.body.data.forEach(function(record) {
+          record.should.have.property('id').and.be.above(0);
+        });
+        email = res.body.data[0];
       })
-      .expect(500, done);
+      .expect(200)
+      .end(llips.test.noIISnodeDevError(done));
   }); //it
-*/
+
+  it('Send email via llips should work', function(done) {
+    this.timeout(10*1000); //30 seconden, ivm trage responstijd Clang
+    llips.clang.send(email.id, {
+      externalId  : 'NodeJS - Mocha',
+      emailAddress: 'christiaan.westerbeek+clang-ltoltest@leadstoloyals.com'
+    }, function(err, res) {
+      res.should.have.property('status', 'success');
+      res.data.should.be.an.Array.with.lengthOf(1);
+      res.data[0].should.have.property('msg', true);
+      done();
+    });
+  }); //it
 };
