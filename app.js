@@ -1,16 +1,17 @@
 var config  = require('./config');
 var lib     = require('./lib');
+var log     = require('./log');
 var llips   = require('llips')(config, lib);
 var clang   = require('clang');
 var express = require('express');
 var RedisStore  = require('connect-redis')(express);
-var logger  = require('express-loggly')(config.loggly);
 
 var api;
 var app = express();
+app.use(express.json());
 app.use(express.cookieParser());
 app.use(express.session({store: new RedisStore(config.web.session.redis), secret: config.web.session.secret}));
-app.use(logger.requestLogger());
+app.use(require('express-bunyan-logger')(log.config));
 app.use(app.router);
 app.use(function(req, res, next){
   // Since this is the last non-error-handling middleware use()d, we assume 404, as nothing else responded.
@@ -20,7 +21,7 @@ app.use(function(req, res, next){
 // error-handling middleware starts here! They take the same form as regular middleware,
 // however they require an arity of 4, aka the signature (err, req, res, next).
 // when connect has an error, it will invoke ONLY error-handling middleware.
-app.use(logger.errorLogger()); //http://stackoverflow.com/questions/15684130/express-js-error-handling
+app.use(require('express-bunyan-logger').errorLogger(log.config));
 app.use(llips.endWithError());
 
 app.get('/clang', function(req, res, next) {
@@ -134,14 +135,14 @@ app.all('/clang/:object?/:id?/:customaction?', function(req, res, next) {
   api.objects[clangObjectName][clangMethodName](args, llips.resToRes(req, res, next, 200));
 });
 
-clang.init(logger, function(err, result) {
+clang.init(function(err, result) {
   if (err) {
-    logger.error('Error creating clang api' + err.message);  
+    console.error('Error creating clang api' + err.message);  
   } else {
-    logger.info('Clang api created');
+    console.info('Clang api created');
     api = result;
 
     app.listen(config.web.port);
-    logger.info('Listening on port ' + config.web.port);
+    console.info('Listening on port ' + config.web.port);
   }
 });
