@@ -11,7 +11,7 @@ var app = express();
 app.use(express.json());
 app.use(express.cookieParser());
 app.use(express.session({store: new RedisStore(config.web.session.redis), secret: config.web.session.secret}));
-app.use(require('express-bunyan-logger')(log.config));
+app.use(require('express-bunyan-logger')(log.config()));
 app.use(app.router);
 app.use(function(req, res, next){
   // Since this is the last non-error-handling middleware use()d, we assume 404, as nothing else responded.
@@ -21,7 +21,7 @@ app.use(function(req, res, next){
 // error-handling middleware starts here! They take the same form as regular middleware,
 // however they require an arity of 4, aka the signature (err, req, res, next).
 // when connect has an error, it will invoke ONLY error-handling middleware.
-app.use(require('express-bunyan-logger').errorLogger(log.config));
+app.use(require('express-bunyan-logger').errorLogger(log.config()));
 app.use(llips.endWithError());
 
 app.get('/clang', function(req, res, next) {
