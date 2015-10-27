@@ -4,7 +4,7 @@
   "description": "RESTifies Clang's API",
   "dependencies": {
     "express": "4.13.3",
-    "clang": "0.1.8"
+    "clang": "0.1.9"
   },
   "private": true
 }
