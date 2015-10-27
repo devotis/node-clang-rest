@@ -25,46 +25,46 @@ app.all('/:object/:id?/:customaction?', function(req, res) {
   var numKeys = Object.keys(req.query).length;
 
   switch(method) {
-  case 'GET'   :
-    if (req.params.id) {
-      clangMethodName = 'getById';
-      args      = req.query;
-      args[clangObjectName + 'Id'] = req.params.id;
-    } else if (numKeys === 0) {
-      clangMethodName = 'getAll';
-    } else if (req.query['externalId'] && numKeys === 1) {
-      clangMethodName = 'getByExternalId';
-      args['externalId'] = req.query['externalId'];
-    } else {
-      clangMethodName = 'getByObject';
-      args      = req.query;
-    }
-    break;
-  case 'POST'  :
-    if (req.params.customaction) {
-      clangMethodName = req.params.customaction; //override methodName with custom action like sendToCustomer (for POST only)
+    case 'GET':
       if (req.params.id) {
-        args             = req.query;
+        clangMethodName = 'getById';
+        args = req.query;
         args[clangObjectName + 'Id'] = req.params.id;
+      } else if (numKeys === 0) {
+        clangMethodName = 'getAll';
+      } else if (req.query['externalId'] && numKeys === 1) {
+        clangMethodName = 'getByExternalId';
+        args['externalId'] = req.query['externalId'];
       } else {
-        return res.status(500).send({message: 'Custom action invoked on unspecified resource (use /objects/123/customaction)'});
+        clangMethodName = 'getByObject';
+        args = req.query;
       }
-    } else {
-      clangMethodName = 'insert';
-      args      = req.query;
-    }
     break;
-  case 'PUT'   :
-    clangMethodName   = 'update';
-    args        = req.query;
-    args.id       = req.params.id;
+    case 'POST':
+      if (req.params.customaction) {
+        clangMethodName = req.params.customaction; //override methodName with custom action like sendToCustomer (for POST only)
+        if (req.params.id) {
+          args = req.query;
+          args[clangObjectName + 'Id'] = req.params.id;
+        } else {
+          return res.status(500).send({message: 'Custom action invoked on unspecified resource (use /objects/123/customaction)'});
+        }
+      } else {
+        clangMethodName = 'insert';
+        args = req.query;
+      }
     break;
-  case 'DELETE':
-    clangMethodName   = 'delete';
-    args.id       = req.params.id;
+    case 'PUT':
+      clangMethodName = 'update';
+      args = req.query;
+      args.id = req.params.id;
     break;
-  default    :
-    return res.status(405).send({message: 'HTTP verb for this resource is not allowed'});
+    case 'DELETE':
+      clangMethodName = 'delete';
+      args.id = req.params.id;
+      break;
+    default:
+      return res.status(405).send({message: 'HTTP verb for this resource is not allowed'});
   }
 
   args.uuid = uuid;
