@@ -39,21 +39,6 @@ The last example is a custom action on a single resource. That is only allowed u
 
 ###Representation
 
-I picked a JSend like way of output after checking online (http://stackoverflow.com/a/14538774/1385429)
-
-    {
-      "status": "success",
-      "data": [{...customer state...}, {...}, ...]
-    }
-
-    {
-      "status": "success",
-      "data": null
-    }
-
-    {
-      "status": "error",
-      "message": "...some error message......."
-    }
+Expect an array of objects when 200/201 or an object with a message property when an error occurred.
 
 HTTP statusses as you would expect from a RESTful webservice remain intact.

@@ -1,16 +1,10 @@
 {
   "name": "clang-rest",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "RESTifies Clang's API",
   "dependencies": {
-  	"express": "3.x",
-    "connect-redis": "1.4.7",
-    "clang": "git://github.com/devotis/clang.git#master",
-    "loggly": "1.0.5",
-    "bunyan-loggly":  "0.0.5",
-    "express-bunyan-logger": "1.1.0",
-    "async": "0.x",
-    "lodash": "2.x"
+    "express": "4.13.3",
+    "clang": "0.1.8"
   },
   "private": true
 }
