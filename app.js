@@ -79,7 +79,9 @@ app.all('/:object/:id?/:customaction?', function(req, res) {
         return res.status(status).send(err.Fault);
       }
       return res.status(status).send({
-        message: err.message
+        message: err.message,
+        method: method,
+        params: req.params
       });
     }
     res.status(200).json(result);
