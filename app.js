@@ -4,7 +4,7 @@ var Clang   = require('clang');
 var clang = new Clang();
 var app   = express();
 
-app.all('/:object/:id?/:customaction?', function(req, res) {
+app.all('/clang/:object/:id?/:customaction?', function(req, res) {
   var uuid = req.headers.uuid || req.query._uuid;
   if (!uuid || !uuid.match(/^([0-9]-)?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i)) { //Clang (probably) uses a version 4 UUIDs scheme relying only on random numbers.
     return res.status(401).send({message: 'uuid missing or invalid (add _uuid=... to your url)'});
