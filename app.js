@@ -53,7 +53,7 @@ app.all('/clang/:object/:id?/:customaction?', function(req, res) {
         args['externalId'] = req.query['externalId'];
       } else {
         clangMethodName = 'getByObject';
-        args = req.query;
+        args[clangObjectName] = req.query;
       }
     break;
     case 'POST':
@@ -67,17 +67,17 @@ app.all('/clang/:object/:id?/:customaction?', function(req, res) {
         }
       } else {
         clangMethodName = 'insert';
-        args = req.query;
+        args[clangObjectName] = req.query;
       }
     break;
     case 'PUT':
       clangMethodName = 'update';
-      args = req.query;
-      args.id = req.params.id;
+      args[clangObjectName] = req.query;
+      args[clangObjectName].id = req.params.id;
     break;
     case 'DELETE':
       clangMethodName = 'delete';
-      args.id = req.params.id;
+      args[clangObjectName].id = req.params.id;
       break;
     default:
       return res.status(405).send({message: 'HTTP verb for this resource is not allowed'});
