@@ -1,8 +1,24 @@
 var express = require('express');
+var winston    = require('winston');
+var expressWinston = require('express-winston');
 var Clang   = require('clang');
 
 var clang = new Clang();
 var app   = express();
+app.set('trust proxy', 1);
+
+expressWinston.requestWhitelist.push('body', 'ip');
+expressWinston.responseWhitelist.push('body');
+app.use(expressWinston.logger({
+  transports: [
+    new winston.transports.Console({
+      json: true,
+      stringify: true,
+      timestamp: true
+    })
+  ],
+  expressFormat: true
+}));
 
 app.all('/clang/:object/:id?/:customaction?', function(req, res) {
   var uuid = req.headers.uuid || req.query._uuid;

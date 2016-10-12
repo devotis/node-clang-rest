@@ -1,10 +1,12 @@
 {
   "name": "clang-rest",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "RESTifies Clang's API",
   "dependencies": {
+    "clang": "0.1.9",
     "express": "4.13.3",
-    "clang": "0.1.9"
+    "express-winston": "^2.0.0",
+    "winston": "^2.2.0"
   },
   "private": true
 }
