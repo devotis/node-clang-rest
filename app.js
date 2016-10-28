@@ -1,10 +1,26 @@
 var express = require('express');
+var winston    = require('winston');
+var expressWinston = require('express-winston');
 var Clang   = require('clang');
 
 var clang = new Clang();
 var app   = express();
+app.set('trust proxy', 1);
 
-app.all('/:object/:id?/:customaction?', function(req, res) {
+expressWinston.requestWhitelist.push('body', 'ip');
+expressWinston.responseWhitelist.push('body');
+app.use(expressWinston.logger({
+  transports: [
+    new winston.transports.Console({
+      json: true,
+      stringify: true,
+      timestamp: true
+    })
+  ],
+  expressFormat: true
+}));
+
+app.all('/clang/:object/:id?/:customaction?', function(req, res) {
   var uuid = req.headers.uuid || req.query._uuid;
   if (!uuid || !uuid.match(/^([0-9]-)?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i)) { //Clang (probably) uses a version 4 UUIDs scheme relying only on random numbers.
     return res.status(401).send({message: 'uuid missing or invalid (add _uuid=... to your url)'});
