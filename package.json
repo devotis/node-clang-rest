@@ -5,7 +5,9 @@
   "dependencies": {
     "clang": "^1.0.9",
     "express": "4.16.4",
+    "express-sslify": "1.2.0",
     "express-winston": "^3.0.1",
+    "helmet": "3.15.0",
     "winston": "^3.1.0"
   },
   "private": true

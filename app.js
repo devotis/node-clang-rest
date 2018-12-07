@@ -1,11 +1,19 @@
 var express = require('express');
+var helmet = require('helmet');
+const enforce = require('express-sslify');
 var winston    = require('winston');
 var expressWinston = require('express-winston');
 var Clang   = require('clang');
 
 var clang = new Clang();
+
+const port = process.env.PORT || 5000;
+
 var app   = express();
-app.set('trust proxy', 1);
+if (process.env.NODE_ENV === 'production') {
+    app.use(helmet());
+    app.use(enforce.HTTPS({ trustProtoHeader: true }));
+}
 
 expressWinston.requestWhitelist.push('body', 'ip');
 expressWinston.responseWhitelist.push('body');
@@ -104,7 +112,7 @@ app.all('/clang/:object/:id?/:customaction?', function(req, res) {
   });
 });
 
-var server = app.listen(process.env.PORT || 3000, function () {
+var server = app.listen(port, function () {
 
   var host = server.address().address;
   var port = server.address().port;
