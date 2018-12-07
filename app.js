@@ -30,7 +30,7 @@ app.use(
     })
 );
 
-app.all('/clang/:object/:id?/:customaction?', (req, res) => {
+app.all('/:object/:id?/:customaction?', (req, res) => {
     const uuid = req.headers.uuid || req.query._uuid;
     if (
         !uuid ||
