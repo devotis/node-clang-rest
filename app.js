@@ -140,7 +140,6 @@ app.all('/clang/:object/:id?/:customaction?', (req, res) => {
 
 const server = app.listen(port, () => {
     const host = server.address().address;
-    const port = server.address().port;
 
-    console.log('app listening at http://%s:%s', host, port);
+    console.log(`app listening at http://${host}:${port}`);
 });
