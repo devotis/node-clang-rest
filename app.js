@@ -1,15 +1,15 @@
-var express = require('express');
-var helmet = require('helmet');
+const express = require('express');
+const helmet = require('helmet');
 const enforce = require('express-sslify');
-var winston = require('winston');
-var expressWinston = require('express-winston');
-var Clang = require('clang');
+const winston = require('winston');
+const expressWinston = require('express-winston');
+const Clang = require('clang');
 
-var clang = new Clang();
+const clang = new Clang();
 
 const port = process.env.PORT || 5000;
 
-var app = express();
+const app = express();
 if (process.env.NODE_ENV === 'production') {
     app.use(helmet());
     app.use(enforce.HTTPS({ trustProtoHeader: true }));
@@ -30,8 +30,8 @@ app.use(
     })
 );
 
-app.all('/clang/:object/:id?/:customaction?', function(req, res) {
-    var uuid = req.headers.uuid || req.query._uuid;
+app.all('/clang/:object/:id?/:customaction?', (req, res) => {
+    const uuid = req.headers.uuid || req.query._uuid;
     if (
         !uuid ||
         !uuid.match(
@@ -44,7 +44,7 @@ app.all('/clang/:object/:id?/:customaction?', function(req, res) {
         });
     }
 
-    var clangObjectName = req.params.object;
+    let clangObjectName = req.params.object;
     //remove a trailing s
     if (
         clangObjectName.match(/s$/) &&
@@ -53,13 +53,13 @@ app.all('/clang/:object/:id?/:customaction?', function(req, res) {
         clangObjectName = clangObjectName.slice(0, -1);
     }
 
-    var clangMethodName;
-    var args = {};
-    var method = req.query._method || req.method; //HTTP VERB override through query paramater (override through http header would be better)
+    let clangMethodName;
+    let args = {};
+    const method = req.query._method || req.method; //HTTP VERB override through query paramater (override through http header would be better)
 
     delete req.query._method;
     delete req.query._uuid;
-    var numKeys = Object.keys(req.query).length;
+    const numKeys = Object.keys(req.query).length;
 
     switch (method) {
         case 'GET':
@@ -111,35 +111,36 @@ app.all('/clang/:object/:id?/:customaction?', function(req, res) {
 
     args.uuid = uuid;
 
-    clang.request(clangObjectName + '_' + clangMethodName, args, function(
-        err,
-        result
-    ) {
-        if (err) {
-            var status = 500;
-            if (
-                err.Fault &&
-                (err.Fault.faultcode == 213 ||
-                    err.Fault.faultstring.match(/not found/i))
-            ) {
-                status = 404;
+    clang.request(
+        clangObjectName + '_' + clangMethodName,
+        args,
+        (err, result) => {
+            if (err) {
+                let status = 500;
+                if (
+                    err.Fault &&
+                    (err.Fault.faultcode == 213 ||
+                        err.Fault.faultstring.match(/not found/i))
+                ) {
+                    status = 404;
+                }
+                if (err.Fault) {
+                    return res.status(status).send(err.Fault);
+                }
+                return res.status(status).send({
+                    message: err.message,
+                    method: method,
+                    params: req.params,
+                });
             }
-            if (err.Fault) {
-                return res.status(status).send(err.Fault);
-            }
-            return res.status(status).send({
-                message: err.message,
-                method: method,
-                params: req.params,
-            });
+            res.status(200).json(result);
         }
-        res.status(200).json(result);
-    });
+    );
 });
 
-var server = app.listen(port, function() {
-    var host = server.address().address;
-    var port = server.address().port;
+const server = app.listen(port, () => {
+    const host = server.address().address;
+    const port = server.address().port;
 
     console.log('app listening at http://%s:%s', host, port);
 });
