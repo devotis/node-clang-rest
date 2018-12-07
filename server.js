@@ -15,6 +15,7 @@ if (process.env.NODE_ENV === 'production') {
     app.use(helmet());
     app.use(enforce.HTTPS({ trustProtoHeader: true }));
 }
+app.use(express.json());
 
 expressWinston.requestWhitelist.push('body', 'ip');
 expressWinston.responseWhitelist.push('body');
@@ -75,7 +76,7 @@ app.all('/:object/:id?/:customaction?', (req, res) => {
                 args['externalId'] = req.query['externalId'];
             } else {
                 clangMethodName = 'getByObject';
-                args[clangObjectName] = req.query;
+                args[clangObjectName] = { ...req.query, ...req.body };
             }
             break;
         case 'POST':
@@ -92,12 +93,12 @@ app.all('/:object/:id?/:customaction?', (req, res) => {
                 }
             } else {
                 clangMethodName = 'insert';
-                args[clangObjectName] = req.query;
+                args[clangObjectName] = { ...req.query, ...req.body };
             }
             break;
         case 'PUT':
             clangMethodName = 'update';
-            args[clangObjectName] = req.query;
+            args[clangObjectName] = { ...req.query, ...req.body };
             args[clangObjectName].id = req.params.id;
             break;
         case 'DELETE':
