@@ -1,6 +1,7 @@
 const express = require('express');
 const helmet = require('helmet');
 const enforce = require('express-sslify');
+const createError = require('http-errors');
 const winston = require('winston');
 const expressWinston = require('express-winston');
 const Clang = require('clang');
@@ -138,8 +139,13 @@ app.all('/:object/:id?/:customaction?', (req, res) => {
     );
 });
 
-const server = app.listen(port, () => {
-    const host = server.address().address;
-
-    console.log(`app listening at http://${host}:${port}`);
+// catch 404 and forward to error handler
+app.use((req, res, next) => {
+    next(createError(404));
 });
+app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.json({ error: err });
+});
+
+app.listen(port, () => console.log(`Listening on port ${port}`));
