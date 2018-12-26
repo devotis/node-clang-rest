@@ -83,8 +83,11 @@ app.all('/:object/:id?/:customaction?', (req, res) => {
             if (req.params.customaction) {
                 clangMethodName = req.params.customaction; //override methodName with custom action like sendToCustomer (for POST only)
                 if (req.params.id) {
-                    args = req.query;
-                    args[clangObjectName + 'Id'] = req.params.id;
+                    args = {
+                        ...req.query,
+                        ...req.body,
+                        [clangObjectName + 'Id']: req.params.id,
+                    };
                 } else {
                     return res.status(500).send({
                         message:
