@@ -2,5 +2,5 @@
 require('llips')().test.webconfig();
 process.env['mocha-unfunk-style'] = 'css';
 
-describe('Brands',    require('./suites/brands'));
+describe('Brands', require('./suites/brands'));
 describe('Customers', require('./suites/customers'));
