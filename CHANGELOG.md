@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2018-12-26
+### Changed
+- Update README.md
+
 ## [1.0.0] - 2018-12-26
 ### Added
 - POST en PUT methods parameters uit body gebruiken
