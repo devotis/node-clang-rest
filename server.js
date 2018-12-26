@@ -4,9 +4,8 @@ const enforce = require('express-sslify');
 const createError = require('http-errors');
 const winston = require('winston');
 const expressWinston = require('express-winston');
-const Clang = require('clang');
-
-const clang = new Clang();
+const clangRequest = require('./lib/clangRequest');
+const prepare = require('./lib/prepare');
 
 const port = process.env.PORT || 5000;
 
@@ -32,122 +31,86 @@ app.use(
     })
 );
 
-app.all('/:object/:id?/:customaction?', (req, res) => {
-    const uuid = req.headers.uuid || req.query._uuid;
-    if (
-        !uuid ||
-        !uuid.match(
-            /^([0-9]-)?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i
-        )
-    ) {
-        //Clang (probably) uses a version 4 UUIDs scheme relying only on random numbers.
-        return res.status(401).send({
-            message: 'uuid missing or invalid (add _uuid=... to your url)',
-        });
-    }
-
-    let clangObjectName = req.params.object;
-    //remove a trailing s
-    if (
-        clangObjectName.match(/s$/) &&
-        !clangObjectName.match(/sms|tatistics$/)
-    ) {
-        clangObjectName = clangObjectName.slice(0, -1);
-    }
-
+app.get('/:object/:id?', prepare, (req, res, next) => {
+    const { clangObjectName } = req.prepared;
     let clangMethodName;
-    let args = {};
-    const method = req.query._method || req.method; //HTTP VERB override through query paramater (override through http header would be better)
+    let args;
 
-    delete req.query._method;
-    delete req.query._uuid;
     const numKeys = Object.keys(req.query).length;
-
-    switch (method) {
-        case 'GET':
-            if (req.params.id) {
-                clangMethodName = 'getById';
-                args = req.query;
-                args[clangObjectName + 'Id'] = req.params.id;
-            } else if (numKeys === 0) {
-                clangMethodName = 'getAll';
-            } else if (req.query['externalId'] && numKeys === 1) {
-                clangMethodName = 'getByExternalId';
-                args['externalId'] = req.query['externalId'];
-            } else {
-                clangMethodName = 'getByObject';
-                args[clangObjectName] = { ...req.query, ...req.body };
-            }
-            break;
-        case 'POST':
-            if (req.params.customaction) {
-                clangMethodName = req.params.customaction; //override methodName with custom action like sendToCustomer (for POST only)
-                if (req.params.id) {
-                    args = {
-                        ...req.query,
-                        ...req.body,
-                        [clangObjectName + 'Id']: req.params.id,
-                    };
-                } else {
-                    return res.status(500).send({
-                        message:
-                            'Custom action invoked on unspecified resource (use /objects/123/customaction)',
-                    });
-                }
-            } else {
-                clangMethodName = 'insert';
-                args[clangObjectName] = { ...req.query, ...req.body };
-            }
-            break;
-        case 'PUT':
-            clangMethodName = 'update';
-            args[clangObjectName] = { ...req.query, ...req.body };
-            args[clangObjectName].id = req.params.id;
-            break;
-        case 'DELETE':
-            clangMethodName = 'delete';
-            args[clangObjectName].id = req.params.id;
-            break;
-        default:
-            return res.status(405).send({
-                message: 'HTTP verb for this resource is not allowed',
-            });
+    if (req.params.id) {
+        clangMethodName = 'getById';
+        args = {
+            ...req.query,
+            [clangObjectName + 'Id']: req.params.id,
+        };
+    } else if (numKeys === 0) {
+        clangMethodName = 'getAll';
+        args = {};
+    } else if (req.query['externalId'] && numKeys === 1) {
+        clangMethodName = 'getByExternalId';
+        args = {
+            externalId: req.query['externalId'],
+        };
+    } else {
+        clangMethodName = 'getByObject';
+        args = {
+            [clangObjectName]: { ...req.query },
+        };
     }
 
-    args.uuid = uuid;
+    clangRequest(req, res, next, clangObjectName, clangMethodName, args);
+});
 
-    clang.request(
-        clangObjectName + '_' + clangMethodName,
-        args,
-        (err, result) => {
-            if (err) {
-                let status = 500;
-                if (
-                    err.Fault &&
-                    (err.Fault.faultcode == 213 ||
-                        err.Fault.faultstring.match(/not found/i))
-                ) {
-                    status = 404;
-                }
-                if (err.Fault) {
-                    return res.status(status).send(err.Fault);
-                }
-                return res.status(status).send({
-                    message: err.message,
-                    method: method,
-                    params: req.params,
-                });
-            }
-            res.status(200).json(result);
-        }
-    );
+app.post('/:object', prepare, (req, res, next) => {
+    const { clangObjectName } = req.prepared;
+    const clangMethodName = 'insert';
+    const args = {
+        [clangObjectName]: { ...req.query, ...req.body },
+    };
+    clangRequest(req, res, next, clangObjectName, clangMethodName, args);
+});
+
+app.post('/:object/:id/:customaction', prepare, (req, res, next) => {
+    const { clangObjectName } = req.prepared;
+    const { customaction: clangMethodName } = req.params;
+    const args = {
+        ...req.query,
+        ...req.body,
+        [clangObjectName + 'Id']: req.params.id,
+    };
+    clangRequest(req, res, next, clangObjectName, clangMethodName, args);
+});
+
+app.put('/:object/:id', prepare, (req, res, next) => {
+    const { clangObjectName } = req.prepared;
+    const clangMethodName = 'update';
+    const args = {
+        [clangObjectName]: {
+            ...req.query,
+            ...req.body,
+            id: req.params.id,
+        },
+    };
+    clangRequest(req, res, next, clangObjectName, clangMethodName, args);
+});
+
+app.delete('/:object/:id', prepare, (req, res, next) => {
+    const { clangObjectName } = req.prepared;
+    const clangMethodName = 'delete';
+    const args = {
+        [clangObjectName]: {
+            id: req.params.id,
+        },
+    };
+    clangRequest(req, res, next, clangObjectName, clangMethodName, args);
 });
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
     next(createError(404));
 });
-app.use(function(err, req, res, next) {
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
     res.status(err.status || 500);
     res.json({ error: err });
 });
