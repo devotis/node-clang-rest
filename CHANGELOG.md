@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2019-01-22
+### Changed
+- Test of alle manual fields meegestuurd worden bij aanroep `email_sendToCustomer`
+
 ## [1.0.1] - 2018-12-26
 ### Changed
 - Update README.md
