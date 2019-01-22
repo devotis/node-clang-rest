@@ -1,6 +1,6 @@
 {
   "name": "clang-rest",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "RESTifies Clang's API",
   "private": true,
   "main": "./server",
