@@ -126,6 +126,14 @@ app.use((req, res, next) => {
 });
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
+    const timeLabel = `request ${req.headers['x-request-id']}`;
+    console.timeLog(
+        timeLabel,
+        `error status ${err.status || 500}, Other > ${
+            typeof err === 'string' ? err : err.message
+        }`
+    );
+
     res.status(err.status || 500);
     res.json({ error: err });
 });
