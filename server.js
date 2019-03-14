@@ -32,6 +32,9 @@ app.use(
 );
 
 app.get('/:object/:id?', prepare, (req, res, next) => {
+    const timeLabel = `request ${req.headers['x-request-id']}`;
+    console.timeLog(timeLabel, 'begin get /:object/:id?');
+
     const { clangObjectName } = req.prepared;
     let clangMethodName;
     let args;
@@ -62,6 +65,9 @@ app.get('/:object/:id?', prepare, (req, res, next) => {
 });
 
 app.post('/:object', prepare, (req, res, next) => {
+    const timeLabel = `request ${req.headers['x-request-id']}`;
+    console.timeLog(timeLabel, 'begin post /:object');
+
     const { clangObjectName } = req.prepared;
     const clangMethodName = 'insert';
     const args = {
@@ -71,6 +77,9 @@ app.post('/:object', prepare, (req, res, next) => {
 });
 
 app.post('/:object/:id/:customaction', prepare, (req, res, next) => {
+    const timeLabel = `request ${req.headers['x-request-id']}`;
+    console.timeLog(timeLabel, 'begin post /:object/:id/:customaction');
+
     const { clangObjectName } = req.prepared;
     const { customaction: clangMethodName } = req.params;
     const args = {
@@ -82,6 +91,9 @@ app.post('/:object/:id/:customaction', prepare, (req, res, next) => {
 });
 
 app.put('/:object/:id', prepare, (req, res, next) => {
+    const timeLabel = `request ${req.headers['x-request-id']}`;
+    console.timeLog(timeLabel, 'begin put /:object/:id');
+
     const { clangObjectName } = req.prepared;
     const clangMethodName = 'update';
     const args = {
@@ -95,6 +107,9 @@ app.put('/:object/:id', prepare, (req, res, next) => {
 });
 
 app.delete('/:object/:id', prepare, (req, res, next) => {
+    const timeLabel = `request ${req.headers['x-request-id']}`;
+    console.timeLog(timeLabel, 'begin delete /:object/:id');
+
     const { clangObjectName } = req.prepared;
     const clangMethodName = 'delete';
     const args = {
