@@ -129,9 +129,7 @@ app.use((err, req, res, next) => {
     const timeLabel = `request ${req.headers['x-request-id']}`;
     console.timeLog(
         timeLabel,
-        `error status ${err.status || 500}, Other > ${
-            typeof err === 'string' ? err : err.message
-        }`
+        `error status ${err.status || 500} - ${err.message || err}`
     );
 
     res.status(err.status || 500);
